@@ -1,0 +1,13 @@
+{
+  "name": "eslint-plugin-import-css-path",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "pkg-build",
+    "tidy": "pkg-tidy"
+  },
+  "devDependencies": {
+    "@stayradiated/pkg": "4.6.0"
+  }
+}
