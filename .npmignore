@@ -1,0 +1,4 @@
+/src
+/yarn.lock
+/dist/*.js.map
+/dist/tsconfig.tsbuildinfo
