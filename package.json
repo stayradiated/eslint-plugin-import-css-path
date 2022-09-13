@@ -8,6 +8,7 @@
     "tidy": "pkg-tidy"
   },
   "devDependencies": {
-    "@stayradiated/pkg": "4.6.0"
+    "@stayradiated/pkg": "4.6.0",
+    "@types/node": "^18.7.17"
   }
 }
