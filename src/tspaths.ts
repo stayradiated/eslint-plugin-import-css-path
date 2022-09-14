@@ -13,10 +13,10 @@ type ResolveOptions = {
 
 type TsPathsResolverFn = (requestedModule: string) => boolean
 
-const readCompilerOptions = (): TsconfigCompilerOptions => {
+const readCompilerOptions = (): TsconfigCompilerOptions | Error => {
   const result = loadConfig()
   if (result.resultType === 'failed') {
-    throw new Error(result.message)
+    return new Error(result.message)
   }
 
   const { absoluteBaseUrl: baseUrl, paths } = result
@@ -29,16 +29,25 @@ const readCompilerOptions = (): TsconfigCompilerOptions => {
 
 const createTsPathsResolver = (
   options: ResolveOptions = {},
-): TsPathsResolverFn => {
+): TsPathsResolverFn | Error => {
   const { compilerOptions = readCompilerOptions(), fileExists } = options
+
+  if (!compilerOptions) {
+    return new Error('Could not read tsconfig.json')
+  }
+
+  if (compilerOptions instanceof Error) {
+    return compilerOptions
+  }
+
   const { baseUrl, paths } = compilerOptions
 
   const matchPath = createMatchPath(baseUrl, paths, ['main'], false)
 
-  const readJSON = () => undefined
+  const readJson = () => undefined
 
   return (requestedModule: string) => {
-    const path = matchPath(requestedModule, readJSON, fileExists, ['.css'])
+    const path = matchPath(requestedModule, readJson, fileExists, ['.css'])
     return typeof path === 'string'
   }
 }

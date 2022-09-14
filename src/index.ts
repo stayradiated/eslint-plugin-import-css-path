@@ -1,4 +1,4 @@
-import { exists } from './exists'
+import { exists } from './exists.js'
 
 const rules = {
   exists,
@@ -8,12 +8,7 @@ const configs = {
   recommended: {
     plugins: ['import-css-path'],
     rules: {
-      'import-css-path/exists': [
-        'error',
-        {
-          useTypescriptPaths: true,
-        },
-      ],
+      'import-css-path/exists': ['error'],
     },
   },
 }

@@ -20,6 +20,7 @@
     "semicolon": false,
     "prettier": true,
     "rules": {
+      "@typescript-eslint/naming-convention": "warn",
       "ava/assertion-arguments": "off",
       "ava/no-ignored-test-files": [
         "error",

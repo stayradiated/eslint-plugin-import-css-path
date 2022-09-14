@@ -1,4 +1,5 @@
-import path from 'node:path'
+import * as path from 'node:path'
+import * as process from 'node:process'
 
 import type { TsPathsResolverFn } from './tspaths.js'
 import { createTsPathsResolver } from './tspaths.js'
@@ -52,6 +53,7 @@ const testRequirePath = (options: TestRequirePathOptions) => {
   let exists: boolean
 
   try {
+    /* eslint-disable-next-line unicorn/prefer-module */
     void require.resolve(requestedModule, { paths: [currentDir] })
     exists = true
   } catch {
@@ -68,7 +70,14 @@ const testRequirePath = (options: TestRequirePathOptions) => {
 }
 
 const exists = (context: Context) => {
-  const resolveTsPath = createTsPathsResolver()
+  let resolveTsPath: TsPathsResolverFn | undefined
+  const resolveTsPathOrError = createTsPathsResolver()
+
+  if (resolveTsPathOrError instanceof Error) {
+    console.error(resolveTsPathOrError.message)
+  } else {
+    resolveTsPath = resolveTsPathOrError
+  }
 
   return {
     ImportDeclaration(node: Node) {

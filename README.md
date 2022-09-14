@@ -4,11 +4,13 @@ A lightweight fork of [eslint-plugin-require-path-exists](https://github.com/Boh
 
 - Only checks CSS files
 - Import path must include file extension
-- Zero dependencies
+- Supports [Typescript custom path
+  mapping](https://www.typescriptlang.org/tsconfig#paths) 
+- Minimal dependencies (only uses `tsconfig-paths`)
 
 ## Usage
 
-1. Install eslint-plugin-require-path-exists as a dev-dependency:
+1. Install `eslint-plugin-require-path-exists` as a dev-dependency:
 
 ```bash
 npm install --save-dev eslint-plugin-import-css-path

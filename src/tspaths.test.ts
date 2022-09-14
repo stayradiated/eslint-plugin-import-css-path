@@ -28,6 +28,11 @@ test('should return false for relative paths', (t) => {
     fileExists: () => true,
   })
 
+  if (resolve instanceof Error) {
+    t.fail(resolve.message)
+    return
+  }
+
   const result = resolve('./styles.css')
 
   t.false(result)
@@ -40,6 +45,11 @@ test('match css path', (t) => {
       return filepath === `${pwd}/src/styles.css`
     },
   })
+
+  if (resolve instanceof Error) {
+    t.fail(resolve.message)
+    return
+  }
 
   const result = resolve('~/styles.css')
 
