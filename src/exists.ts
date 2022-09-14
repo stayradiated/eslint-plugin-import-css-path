@@ -9,8 +9,8 @@ type Node = TSESTree.Node
 type ImportDeclarationNode = TSESTree.ImportDeclaration
 type CallExpressionNode = TSESTree.CallExpression
 type StringLiteralNode = TSESTree.StringLiteral
-type Context = TSESLint.RuleContext<any, unknown[]>
 
+type Context = TSESLint.RuleContext<'errNotFound', unknown[]>
 const getCurrentDirectory = (context: Context) => {
   let filename = context.getFilename()
   if (!path.isAbsolute(filename)) {
@@ -53,49 +53,59 @@ const testRequirePath = (options: TestRequirePathOptions) => {
   if (!exists) {
     context.report({
       node,
-      messageId: `Cannot find module: ${requestedModule}`,
+      messageId: 'errNotFound',
+      data: {
+        requestedModule
+      }
     })
   }
 }
 
-const exists = (context: Context): unknown => {
-  const resolveTsPathOrError = createTsPathsResolver()
+const exists = {
+  meta: {
+    messages: {
+      errNotFound: 'Cannot find module: {{requestedModule}}',
+    }
+  },
+  create: (context: Context): unknown => {
+    const resolveTsPathOrError = createTsPathsResolver()
 
-  const resolveTsPath =
-    resolveTsPathOrError instanceof Error ? undefined : resolveTsPathOrError
+    const resolveTsPath =
+      resolveTsPathOrError instanceof Error ? undefined : resolveTsPathOrError
 
-  return {
-    ImportDeclaration(node: ImportDeclarationNode) {
-      testRequirePath({
-        requestedModule: node.source.value,
-        node,
-        context,
-        resolveTsPath,
-      })
-    },
+    return {
+      ImportDeclaration(node: ImportDeclarationNode) {
+        testRequirePath({
+          requestedModule: node.source.value,
+          node,
+          context,
+          resolveTsPath,
+        })
+      },
 
-    CallExpression(node: CallExpressionNode) {
-      const firstArg = node.arguments[0] as StringLiteralNode
+      CallExpression(node: CallExpressionNode) {
+        const firstArg = node.arguments[0] as StringLiteralNode
 
-      if (!firstArg) {
-        return
-      }
+        if (!firstArg) {
+          return
+        }
 
-      if (
-        node.callee.type !== 'Identifier' ||
-        node.callee.name !== 'require' ||
-        typeof firstArg.value !== 'string'
-      ) {
-        return
-      }
+        if (
+          node.callee.type !== 'Identifier' ||
+          node.callee.name !== 'require' ||
+          typeof firstArg.value !== 'string'
+        ) {
+          return
+        }
 
-      testRequirePath({
-        requestedModule: firstArg.value,
-        node,
-        context,
-        resolveTsPath,
-      })
-    },
+        testRequirePath({
+          requestedModule: firstArg.value,
+          node,
+          context,
+          resolveTsPath,
+        })
+      },
+    }
   }
 }
 
