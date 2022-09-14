@@ -1,29 +1,15 @@
 import * as path from 'node:path'
 import * as process from 'node:process'
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils'
 
 import type { TsPathsResolverFn } from './tspaths.js'
 import { createTsPathsResolver } from './tspaths.js'
 
-type Node = {
-  arguments: ReadonlyArray<{
-    value: string
-  }>
-  callee: {
-    name: string
-  }
-  source: {
-    value: string
-  }
-}
-
-type Context = {
-  getFilename: () => string
-  report: (
-    node: Node,
-    message: string,
-    options: Record<string, unknown>,
-  ) => void
-}
+type Node = TSESTree.Node
+type ImportDeclarationNode = TSESTree.ImportDeclaration
+type CallExpressionNode = TSESTree.CallExpression
+type StringLiteralNode = TSESTree.StringLiteral
+type Context = TSESLint.RuleContext<any, unknown[]>
 
 const getCurrentDirectory = (context: Context) => {
   let filename = context.getFilename()
@@ -65,22 +51,21 @@ const testRequirePath = (options: TestRequirePathOptions) => {
   }
 
   if (!exists) {
-    context.report(node, `Cannot find module: ${requestedModule}`, {})
+    context.report({
+      node,
+      messageId: `Cannot find module: ${requestedModule}`,
+    })
   }
 }
 
-const exists = (context: Context) => {
-  let resolveTsPath: TsPathsResolverFn | undefined
+const exists = (context: Context): unknown => {
   const resolveTsPathOrError = createTsPathsResolver()
 
-  if (resolveTsPathOrError instanceof Error) {
-    console.error(resolveTsPathOrError.message)
-  } else {
-    resolveTsPath = resolveTsPathOrError
-  }
+  const resolveTsPath =
+    resolveTsPathOrError instanceof Error ? undefined : resolveTsPathOrError
 
   return {
-    ImportDeclaration(node: Node) {
+    ImportDeclaration(node: ImportDeclarationNode) {
       testRequirePath({
         requestedModule: node.source.value,
         node,
@@ -89,16 +74,23 @@ const exists = (context: Context) => {
       })
     },
 
-    CallExpression(node: Node) {
+    CallExpression(node: CallExpressionNode) {
+      const firstArg = node.arguments[0] as StringLiteralNode
+
+      if (!firstArg) {
+        return
+      }
+
       if (
+        node.callee.type !== 'Identifier' ||
         node.callee.name !== 'require' ||
-        typeof node.arguments[0]?.value !== 'string'
+        typeof firstArg.value !== 'string'
       ) {
         return
       }
 
       testRequirePath({
-        requestedModule: node.arguments[0].value,
+        requestedModule: firstArg.value,
         node,
         context,
         resolveTsPath,
