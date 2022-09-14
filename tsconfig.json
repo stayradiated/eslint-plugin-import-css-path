@@ -2,7 +2,7 @@
   "__comment": "This typescipt config is managed by `@stayradiated/jsconfig`",
   "compilerOptions": {
     "outDir": "dist",
-    "module": "ES2020",
+    "module": "commonjs",
     "moduleResolution": "node",
     "moduleDetection": "force",
     "target": "ES2022",

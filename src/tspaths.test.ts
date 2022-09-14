@@ -1,5 +1,5 @@
+import * as process from 'node:process'
 import test from 'ava'
-import process from 'node:process'
 
 import { readCompilerOptions, createTsPathsResolver } from './tspaths.js'
 
@@ -8,8 +8,8 @@ const pwd = process.env['PWD']!
 const compilerOptions = {
   baseUrl: pwd,
   paths: {
-    '~/*': ['./src/*']
-  }
+    '~/*': ['./src/*'],
+  },
 }
 
 test('readCompilerOptions', (t) => {
@@ -18,6 +18,7 @@ test('readCompilerOptions', (t) => {
     t.fail(actualCompilerOptions.message)
     return
   }
+
   t.deepEqual(actualCompilerOptions, compilerOptions)
 })
 
@@ -35,9 +36,9 @@ test('should return false for relative paths', (t) => {
 test('match css path', (t) => {
   const resolve = createTsPathsResolver({
     compilerOptions,
-    fileExists: (filepath) => {
+    fileExists(filepath) {
       return filepath === `${pwd}/src/styles.css`
-    }
+    },
   })
 
   const result = resolve('~/styles.css')

@@ -1,6 +1,7 @@
 import path from 'node:path'
 
-import { createTsPathsResolver, TsPathsResolverFn } from './tspaths.js'
+import type { TsPathsResolverFn } from './tspaths.js'
+import { createTsPathsResolver } from './tspaths.js'
 
 type Node = {
   arguments: ReadonlyArray<{
@@ -33,9 +34,9 @@ const getCurrentDirectory = (context: Context) => {
 }
 
 type TestRequirePathOptions = {
-  requestedModule: string,
-  node: Node,
-  context: Context,
+  requestedModule: string
+  node: Node
+  context: Context
   resolveTsPath?: TsPathsResolverFn
 }
 
@@ -71,7 +72,12 @@ const exists = (context: Context) => {
 
   return {
     ImportDeclaration(node: Node) {
-      testRequirePath({ requestedModule: node.source.value, node, context, resolveTsPath })
+      testRequirePath({
+        requestedModule: node.source.value,
+        node,
+        context,
+        resolveTsPath,
+      })
     },
 
     CallExpression(node: Node) {
@@ -82,7 +88,12 @@ const exists = (context: Context) => {
         return
       }
 
-      testRequirePath({ requestedModule: node.arguments[0].value, node, context, resolveTsPath })
+      testRequirePath({
+        requestedModule: node.arguments[0].value,
+        node,
+        context,
+        resolveTsPath,
+      })
     },
   }
 }

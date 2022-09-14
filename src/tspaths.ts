@@ -6,8 +6,8 @@ type TsconfigCompilerOptions = {
 }
 
 type ResolveOptions = {
-  compilerOptions?: TsconfigCompilerOptions,
-  // useful for testing
+  compilerOptions?: TsconfigCompilerOptions
+  // Useful for testing
   fileExists?: (filepath: string) => boolean
 }
 
@@ -27,7 +27,9 @@ const readCompilerOptions = (): TsconfigCompilerOptions => {
   }
 }
 
-const createTsPathsResolver = (options: ResolveOptions = {}): TsPathsResolverFn => {
+const createTsPathsResolver = (
+  options: ResolveOptions = {},
+): TsPathsResolverFn => {
   const { compilerOptions = readCompilerOptions(), fileExists } = options
   const { baseUrl, paths } = compilerOptions
 
@@ -41,8 +43,5 @@ const createTsPathsResolver = (options: ResolveOptions = {}): TsPathsResolverFn 
   }
 }
 
-export {
-  readCompilerOptions,
-  createTsPathsResolver,
-}
+export { readCompilerOptions, createTsPathsResolver }
 export type { TsPathsResolverFn }
